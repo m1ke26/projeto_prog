@@ -8,6 +8,51 @@ using namespace tinyxml2;
 
 namespace svg
 {
+    void apply_transform(XMLElement* child, SVGElement* elem){
+
+        const char* t = child->Attribute("transform");
+        if (t == nullptr) return;
+        string transform = t;
+
+        Point origin = {0, 0};
+        const char* o = child->Attribute("transform-origin");
+        if (o != nullptr) {
+            stringstream ss(o);
+            ss >> origin.x >> origin.y;
+        }
+
+        if (transform.find("translate") != string::npos) {
+            for (char& c : transform) {
+                if (c == '(' || c == ')') c = ' ';
+            }
+                stringstream ss(transform);
+            string palavra;
+            int x, y;
+            ss >> palavra >> x >> y;
+            elem->translate({x, y});
+        }
+        else if (transform.find("rotate") != string::npos) {
+            for (char& c : transform) {
+                if (c == '(' || c == ')') c = ' ';
+            }
+            stringstream ss(transform);
+            string palavra;
+            int angulo;
+            ss >> palavra >> angulo;
+            elem->rotate(origin, angulo);
+        }
+        else if (transform.find("scale") != string::npos) {
+            for (char& c : transform) {
+                if (c == '(' || c == ')') c = ' ';
+            }
+            stringstream ss(transform);
+            string palavra;
+            int fator;
+            ss >> palavra >> fator;
+            elem->scale(origin, fator);
+        }
+    }
+
     void readSVG(const string& svg_file, Point& dimensions, vector<SVGElement *>& svg_elements)
     {
         XMLDocument doc;
@@ -20,7 +65,7 @@ namespace svg
 
         dimensions.x = xml_elem->IntAttribute("width");
         dimensions.y = xml_elem->IntAttribute("height");
-        
+
         // TODO complete code -->
         for (XMLElement *child = xml_elem->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()){
             if(string(child->Name()) == "circle"){
@@ -30,7 +75,9 @@ namespace svg
                 string fill = child->Attribute("fill");
                 Color cor = parse_color(fill);
                 Point center = {cx, cy};
-                svg_elements.push_back(new Circle(cor, center, r));
+                SVGElement* e = new Circle(cor, center, r);
+                apply_transform(child, e);
+                svg_elements.push_back(e);
             }
 
             else if(string(child->Name()) == "ellipse"){
@@ -42,7 +89,9 @@ namespace svg
                 Color cor = parse_color(fill);
                 Point center = {cx, cy};
                 Point radius = {rx, ry};
-                svg_elements.push_back(new Ellipse(cor, center, radius));
+                SVGElement* e = new Ellipse(cor, center, radius);
+                apply_transform(child, e);
+                svg_elements.push_back(e);
             }
 
             else if(string(child->Name()) == "polyline"){
@@ -52,7 +101,7 @@ namespace svg
 
                 string stroke = child->Attribute("stroke");
                 Color cor = parse_color(stroke);
-                
+
                 string par;
                 while (ss >> par) {
                     stringstream par_ss(par);
@@ -63,7 +112,9 @@ namespace svg
                     int y = stoi(y_str);
                     pts.push_back({x, y});
                 }
-                svg_elements.push_back(new Polyline(cor, pts));
+                SVGElement* e = new Polyline(cor, pts);
+                apply_transform(child, e);
+                svg_elements.push_back(e);
             }
 
             else if(string(child->Name()) == "rect"){
@@ -73,7 +124,9 @@ namespace svg
                 int height = child->IntAttribute("height");
                 string fill = child->Attribute("fill");
                 Color cor = parse_color(fill);
-                svg_elements.push_back(new Rect(cor, width, height, x, y));
+                SVGElement* e = new Rect(cor, width, height, x, y);
+                apply_transform(child, e);
+                svg_elements.push_back(e);
             }
 
             else if(string(child->Name()) == "line"){
@@ -85,7 +138,9 @@ namespace svg
                 Point p2 = {x2,y2};
                 string stroke = child->Attribute("stroke");
                 Color cor = parse_color(stroke);
-                svg_elements.push_back(new Line(cor, p1, p2));
+                SVGElement* e = new Line(cor, p1, p2);
+                apply_transform(child, e);
+                svg_elements.push_back(e);
             }
 
             else if(string(child->Name()) == "polygon"){
@@ -95,7 +150,7 @@ namespace svg
                 vector<Point> pts;
                 stringstream ss(points);
 
-                
+
                 string par;
                 while (ss >> par) {
                     stringstream par_ss(par);
@@ -106,7 +161,9 @@ namespace svg
                     int y = stoi(y_str);
                     pts.push_back({x, y});
                 }
-                svg_elements.push_back(new Polygon(cor, pts));
+                SVGElement* e = new Polygon(cor, pts);
+                apply_transform(child, e);
+                svg_elements.push_back(e);
             }
         }
     }
