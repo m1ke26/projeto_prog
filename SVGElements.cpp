@@ -28,6 +28,11 @@ namespace svg
         center = center.scale(origin, v);
         radius = radius.scale({0, 0}, v);
     }
+    SVGElement *Ellipse::clone() const
+    {
+        return new Ellipse(fill, center, radius);
+    }
+
     /*-----------------------------------------------------------*/
     Circle::Circle(const Color &fill, const Point &center, const int radius)
         : Ellipse(fill, center, {radius, radius})
@@ -66,6 +71,10 @@ namespace svg
             points[i] = points[i].scale(origin, v);
         }
     }
+    SVGElement *Polyline::clone() const
+    {
+        return new Polyline(stroke, points);
+    }
     /*-----------------------------------------------------------*/
     Line::Line(const Color &stroke, const Point &point1, const Point &point2)
         : Polyline(stroke, {point1, point2})
@@ -100,6 +109,10 @@ namespace svg
         {
             points[i] = points[i].scale(origin, v);
         }
+    }
+    SVGElement *Polygon::clone() const
+    {
+        return new Polygon(fill, points);
     }
     /*-----------------------------------------------------------*/
     Rect::Rect(const Color &fill, int width, int height, int x, int y)
@@ -137,6 +150,22 @@ namespace svg
         for (size_t i = 0; i < element.size(); i++)
         {
             element[i]->scale(origin, v);
+        }
+    }
+    SVGElement *Group::clone() const
+    {
+        std::vector<SVGElement *> cloned;
+        for (size_t i = 0; i < element.size(); i++)
+        {
+            cloned.push_back(element[i]->clone());
+        }
+        return new Group(cloned);
+    }
+    Group::~Group()
+    {
+        for (size_t i = 0; i < element.size(); i++)
+        {
+            delete element[i];
         }
     }
 }
