@@ -19,6 +19,9 @@ namespace svg
         SVGElement();
         virtual ~SVGElement();
         virtual void draw(PNGImage &img) const = 0;
+        virtual void translate(const Point &t) = 0;                /*tirado do point.hpp*/
+        virtual void rotate(const Point &origin, int degrees) = 0; /*tirado do point.hpp*/
+        virtual void scale(const Point &origin, int v) = 0;        /*tirado do point.hpp*/
     };
 
     // Declaration of namespace functions
@@ -31,11 +34,15 @@ namespace svg
     void convert(const std::string &svg_file,
                  const std::string &png_file);
 
+    /*-----------------------------------------------------------*/
     class Ellipse : public SVGElement
     {
     public:
         Ellipse(const Color &fill, const Point &center, const Point &radius);
         void draw(PNGImage &img) const override;
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override;
 
     private:
         Color fill;
@@ -54,6 +61,9 @@ namespace svg
     public:
         Polyline(const Color &stroke, const std::vector<Point> &points);
         void draw(PNGImage &img) const override;
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override;
 
     private:
         Color stroke;
@@ -71,6 +81,9 @@ namespace svg
     public:
         Polygon(const Color &fill, const std::vector<Point> &points);
         void draw(PNGImage &img) const override;
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override;
 
     private:
         Color fill;
@@ -88,6 +101,9 @@ namespace svg
     public:
         Group(const std::vector<SVGElement *> &element);
         void draw(PNGImage &img) const override;
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override;
 
     private:
         std::vector<SVGElement *> element;
