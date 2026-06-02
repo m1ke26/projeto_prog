@@ -51,4 +51,16 @@ namespace svg
         : Polygon(fill, {{x, y}, {x + width, y}, {x + width, y + height}, {x, y + height}})
     {
     }
+    /*-----------------------------------------------------------*/
+    Group::Group(std::vector<SVGElement *> &element)
+        : element(element)
+    {
+    }
+    void Group::draw(PNGImage &img) const
+    {
+        for (int i = 0; i < element.size(); i++)
+        {
+            element[i]->draw(img);
+        }
+    };
 }

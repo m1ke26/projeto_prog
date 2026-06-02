@@ -46,7 +46,7 @@ namespace svg
     class Circle : public Ellipse
     {
     public:
-        Circle(const Color &fill, const Point &center, const int &r);
+        Circle(const Color &fill, const Point &center, const int &radius);
     };
     /*-----------------------------------------------------------*/
     class Polyline : public SVGElement
