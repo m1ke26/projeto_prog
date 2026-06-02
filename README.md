@@ -3,8 +3,6 @@
 
 ## Group elements
 
-Identify all group elements (numbers and names).
-
 - up202407610 Miguel da Silva Mimoso
 - up202407548 Diogo Rodrigues Caleiro
 - up202405947 Gonçalo Pinto Leite Magalhaes Martinho
