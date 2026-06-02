@@ -5,6 +5,9 @@
 #include "Color.hpp"
 #include "Point.hpp"
 #include "PNGImage.hpp"
+#include <bitset>
+#include <deque>
+#include <forward_list>
 
 namespace svg
 {
@@ -12,6 +15,7 @@ namespace svg
     {
 
     public:
+        int vElement = 0;
         SVGElement();
         virtual ~SVGElement();
         virtual void draw(PNGImage &img) const = 0;

@@ -22,6 +22,25 @@ namespace svg
         dimensions.y = xml_elem->IntAttribute("height");
         
         // TODO complete code -->
-        
+        for (XMLElement *child = xml_elem->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()){
+            if(string(child->Name()) == "circle"){
+                
+            }
+            else if(string(child->Name()) == "ellipse"){
+                
+            }
+            else if(string(child->Name()) == "polyline"){
+                
+            }
+            else if(string(child->Name()) == "rect"){
+                
+            }
+            else if(string(child->Name()) == "line"){
+                
+            }
+            else if(string(child->Name()) == "polygon"){
+                
+            }
+        }
     }
 }
