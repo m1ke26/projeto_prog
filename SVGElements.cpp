@@ -116,7 +116,7 @@ namespace svg
     }
     /*-----------------------------------------------------------*/
     Rect::Rect(const Color &fill, int width, int height, int x, int y)
-        : Polygon(fill, {{x, y}, {x + width, y}, {x + width, y + height}, {x, y + height}})
+        : Polygon(fill, {{x, y}, {x + width - 1, y}, {x + width - 1, y + height - 1}, {x, y + height - 1}})
     {
     }
     /*-----------------------------------------------------------*/
@@ -125,35 +125,40 @@ namespace svg
     {
     }
 
-    void Group::draw(PNGImage &img) const{
-    
+    void Group::draw(PNGImage &img) const
+    {
+
         for (size_t i = 0; i < element.size(); i++)
         {
             element[i]->draw(img);
         }
     }
 
-    void Group::translate(const Point &t){
+    void Group::translate(const Point &t)
+    {
         for (size_t i = 0; i < element.size(); i++)
         {
             element[i]->translate(t);
         }
     }
-    void Group::rotate(const Point &origin, int degrees){
+    void Group::rotate(const Point &origin, int degrees)
+    {
         for (size_t i = 0; i < element.size(); i++)
         {
             element[i]->rotate(origin, degrees);
         }
     }
 
-    void Group::scale(const Point &origin, int v){
+    void Group::scale(const Point &origin, int v)
+    {
         for (size_t i = 0; i < element.size(); i++)
         {
             element[i]->scale(origin, v);
         }
     }
-    
-    SVGElement *Group::clone() const{
+
+    SVGElement *Group::clone() const
+    {
         std::vector<SVGElement *> cloned;
         for (size_t i = 0; i < element.size(); i++)
         {
@@ -162,7 +167,8 @@ namespace svg
         return new Group(cloned);
     }
 
-    Group::~Group(){
+    Group::~Group()
+    {
         for (size_t i = 0; i < element.size(); i++)
         {
             delete element[i];
