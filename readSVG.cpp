@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iostream>
+#include <map>
 #include "SVGElements.hpp"
 #include "external/tinyxml2/tinyxml2.h"
 
@@ -53,7 +54,12 @@ namespace svg
         }
     }
 
-    SVGElement* parse_element(XMLElement* child) {
+    void register_id(XMLElement* child, SVGElement* e, map<string, SVGElement*>& id_map) {
+        const char* id = child->Attribute("id");
+        if (id != nullptr) id_map[id] = e;
+    }
+
+    SVGElement* parse_element(XMLElement* child, map<string, SVGElement*>& id_map) {
         string name = child->Name();
 
         if (name == "circle") {
@@ -65,6 +71,7 @@ namespace svg
             Point center = {cx, cy};
             SVGElement* e = new Circle(cor, center, r);
             apply_transform(child, e);
+            register_id(child, e, id_map);
             return e;
         }
         else if (name == "ellipse") {
@@ -78,6 +85,7 @@ namespace svg
             Point radius = {rx, ry};
             SVGElement* e = new Ellipse(cor, center, radius);
             apply_transform(child, e);
+            register_id(child, e, id_map);
             return e;
         }
         else if (name == "polyline") {
@@ -98,6 +106,7 @@ namespace svg
             }
             SVGElement* e = new Polyline(cor, pts);
             apply_transform(child, e);
+            register_id(child, e, id_map);
             return e;
         }
         else if (name == "rect") {
@@ -109,6 +118,7 @@ namespace svg
             Color cor = parse_color(fill);
             SVGElement* e = new Rect(cor, width, height, x, y);
             apply_transform(child, e);
+            register_id(child, e, id_map);
             return e;
         }
         else if (name == "line") {
@@ -122,6 +132,7 @@ namespace svg
             Color cor = parse_color(stroke);
             SVGElement* e = new Line(cor, p1, p2);
             apply_transform(child, e);
+            register_id(child, e, id_map);
             return e;
         }
         else if (name == "polygon") {
@@ -142,15 +153,25 @@ namespace svg
             }
             SVGElement* e = new Polygon(cor, pts);
             apply_transform(child, e);
+            register_id(child, e, id_map);
             return e;
         }
         else if (name == "g") {
             vector<SVGElement*> filhos;
             for (XMLElement* filho = child->FirstChildElement(); filho != nullptr; filho = filho->NextSiblingElement()) {
-                filhos.push_back(parse_element(filho));
+                filhos.push_back(parse_element(filho, id_map));
             }
             SVGElement* e = new Group(filhos);
             apply_transform(child, e);
+            register_id(child, e, id_map);
+            return e;
+        }
+        else if (name == "use") {
+            string href = child->Attribute("href");
+            string id = href.substr(1);
+            SVGElement* e = id_map[id]->clone();
+            apply_transform(child, e);
+            register_id(child, e, id_map);
             return e;
         }
         return nullptr;
@@ -169,8 +190,9 @@ namespace svg
         dimensions.x = xml_elem->IntAttribute("width");
         dimensions.y = xml_elem->IntAttribute("height");
 
+        map<string, SVGElement*> id_map;
         for (XMLElement *child = xml_elem->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
-            SVGElement* e = parse_element(child);
+            SVGElement* e = parse_element(child, id_map);
             if (e != nullptr) svg_elements.push_back(e);
         }
     }
